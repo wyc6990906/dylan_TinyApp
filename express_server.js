@@ -10,15 +10,22 @@ const urlDatabase = {
 //ejs
 app.set("view engine", "ejs");
 
-
-app.get("/", (req, res) => {
-  res.send("Hello!");
+//just demo useless
+app.get("/hello", (req, res) => {
+  const templateVars = {greeting: 'Hello World!'};
+  res.render("hello_world", templateVars);
 });
-
-
-app.get("/urls.json", (req, res) => {
+app.get("/urls", (req, res) => {
   res.json(urlDatabase);
 });
+
+
+app.get("/", (req, res) => {
+  const templateVars = {urls: urlDatabase}
+  res.render("urls_index", templateVars);
+});
+
+
 
 
 app.listen(PORT, () => {
