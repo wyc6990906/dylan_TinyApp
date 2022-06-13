@@ -1,0 +1,20 @@
+{
+  "name": "dylan_tinyapp",
+  "version": "1.0.0",
+  "description": "TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wyc6990906/dylan_TinyApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wyc6990906/dylan_TinyApp/issues"
+  },
+  "homepage": "https://github.com/wyc6990906/dylan_TinyApp#readme"
+}
