@@ -4,16 +4,19 @@ const morgan = require('morgan')
 const bodyParser = require('body-parser')
 const app = express();
 
+// Basic settings
+//ejs
+app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}))
-//use morgan middleware
+//use morgan middleware to log bugs
 app.use(morgan('dev'))
 const PORT = 8080; // default port 8080
 
+//fake database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
-
 // GENERATES RANDOM STRINGS FOR SHORTURL
 const generateRandomString = function (database) {
   let randomNumberArray = [];
@@ -33,40 +36,62 @@ const generateRandomString = function (database) {
   }).join('');
 };
 
-//ejs
-app.set("view engine", "ejs");
 
+/* GET REQUESTS*/
 //just demo useless
 app.get("/hello", (req, res) => {
   const templateVars = {greeting: 'Hello World!'};
   res.render("hello_world", templateVars);
 });
-
+// Redirects to the urls page if no address is defined
 app.get("/", (req, res) => {
-  const templateVars = {greeting: 'Hello World!'};
-  res.render("hello_world", templateVars);
+  res.redirect('/urls')
 });
 
+// main page show all the urls
 app.get("/urls", (req, res) => {
   const templateVars = {urls: urlDatabase}
   res.render("urls_index", templateVars);
 });
-// deal form request
-app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
-})
 
+// Create New URLs(long)
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+//view short URLs
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
   res.render("urls_show", templateVars);
 });
 
 
+// Redirect to longURL //
+app.get("/u/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL];
+  if (!shortURL || !longURL) {
+    res.send('There is no record of this url address!')
+  }
+  res.redirect(longURL);
+});
+
+
+/* POST REQUESTS*/
+// deal form request
+app.post("/urls", (req, res) => {
+  // console.log(req.body);  // Log the POST request body to the console
+  const shortURL = generateRandomString(urlDatabase)
+  urlDatabase[shortURL] = req.body.longURL
+  // console.log(urlDatabase)  //add new urlObject to database
+  // console.log(shortURL)
+  res.redirect(`/urls/${shortURL}`)
+})
+
+
+
+
+
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`Dylan's URL TinyApp listening on port ${PORT}!`);
 });
