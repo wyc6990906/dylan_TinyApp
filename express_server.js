@@ -15,12 +15,14 @@ app.get("/hello", (req, res) => {
   const templateVars = {greeting: 'Hello World!'};
   res.render("hello_world", templateVars);
 });
-app.get("/urls", (req, res) => {
-  res.json(urlDatabase);
-});
 
 
 app.get("/", (req, res) => {
+  const templateVars = {greeting: 'Hello World!'};
+  res.render("hello_world", templateVars);
+});
+
+app.get("/urls", (req, res) => {
   const templateVars = {urls: urlDatabase}
   res.render("urls_index", templateVars);
 });
