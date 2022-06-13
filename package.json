@@ -4,6 +4,7 @@
   "description": "TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).",
   "main": "index.js",
   "scripts": {
+    "start": "./node_modules/.bin/nodemon -L express_server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,6 +24,7 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "ejs": "^3.1.8"
+    "ejs": "^3.1.8",
+    "nodemon": "^2.0.16"
   }
 }
