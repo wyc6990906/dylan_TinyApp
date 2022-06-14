@@ -14,11 +14,24 @@ app.use(morgan('dev'))
 app.use(cookieParser())
 const PORT = 8080; // default port 8080
 
-//fake database
+//fake url database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
+//fake user database
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
 // GENERATES RANDOM STRINGS FOR SHORTURL
 const generateRandomString = function (database) {
   let randomNumberArray = [];
@@ -101,6 +114,22 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 /* POST REQUESTS*/
+// deal register
+app.post("/register", (req, res) => {
+  // console.log('register Handler========', req.body)
+  const id = generateRandomString(users)
+  const user = {
+    id,
+    email: req.body.email,
+    password: req.body.password
+  }
+  users[id] = user
+  // console.log(users)
+  res.cookie('user_id', id)
+  res.redirect('/urls')
+})
+
+
 //deal login
 app.post("/login", (req, res) => {
   // console.log('login Handler========', req.body)
