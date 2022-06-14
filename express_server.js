@@ -50,6 +50,13 @@ app.get("/", (req, res) => {
   res.redirect('/urls')
 });
 
+
+//register
+app.get("/register", (req, res) => {
+  // const templateVars = {greeting: 'Hello World!'};
+  res.render("register");
+});
+
 //login
 app.get('/login', (req, res) => {
   const templateVars = {
