@@ -11,5 +11,24 @@
                 <a class="nav-item nav-link link-light" href="/urls/new">Create New URL</a>
             </div>
         </div>
+        <!--  login form       -->
+        <div>
+            <% if (username === undefined) { %>
+            <form class="form-inline" method="POST" action="/login">
+                <label for="username" style="color: white">
+                    <input class="form-control" type="text" name="username" placeholder="username..."
+                           style="width: 150px;">
+                </label>
+                <button type="submit" class="button btn-dark" style="margin-left: 10px;">Login</button>
+                <% } else { %>
+                    <form class="form-inline" method="POST" action="/logout">
+                        <label for="username"
+                               style="color: white;margin: 10px"><%= `Welcome back, ${username}! `; %></label>
+                        <button type="submit" class="button btn-dark" style="margin-left: 2px;">Log Out</button>
+                    </form>
+                <% } %>
+            </form>
+        </div>
+
     </nav>
 </header>
