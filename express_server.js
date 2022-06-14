@@ -95,6 +95,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect('/urls');
 })
 
+app.post("/urls/:id", (req, res) => {
+
+})
+
 
 app.listen(PORT, () => {
   console.log(`Dylan's URL TinyApp listening on port ${PORT}!`);
