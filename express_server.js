@@ -1,21 +1,23 @@
 const express = require("express")
 const morgan = require('morgan')
+const cookieParser = require("cookie-parser")
 // in order to make post buffer readable
 const bodyParser = require('body-parser')
 const app = express();
-
 // Basic settings
 //ejs
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}))
 //use morgan middleware to log bugs
 app.use(morgan('dev'))
+//cookie parser
+app.use(cookieParser())
 const PORT = 8080; // default port 8080
 
 //fake database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "9sm5xK": "http://www.google.com",
 };
 // GENERATES RANDOM STRINGS FOR SHORTURL
 const generateRandomString = function (database) {
@@ -48,20 +50,34 @@ app.get("/", (req, res) => {
   res.redirect('/urls')
 });
 
+//login
+app.get('/login', (req, res) => {
+  const templateVars = {
+    user: null
+  };
+  // res.render('login', templateVars);
+});
+
+
 // main page show all the urls
 app.get("/urls", (req, res) => {
-  const templateVars = {urls: urlDatabase}
+  const templateVars = {urls: urlDatabase, username: req.cookies["username"],}
   res.render("urls_index", templateVars);
 });
 
 // Create New URLs(long)
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {username: req.cookies["username"],}
+  res.render("urls_new", templateVars);
 });
 
 //view short URLs
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = {shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
+  const templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL],
+    username: req.cookies["username"],
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -78,6 +94,19 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 /* POST REQUESTS*/
+//deal login
+app.post("/login", (req, res) => {
+  // console.log('login Handler========', req.body)
+  res.cookie('username', req.body.username)
+  res.redirect('/urls')
+})
+
+//deal logout
+app.post("/logout", (req, res) => {
+  res.clearCookie('username')
+  res.redirect('/urls')
+})
+
 // deal form request
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
@@ -93,10 +122,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const {shortURL} = req.params;
   delete urlDatabase[shortURL];
   res.redirect('/urls');
-})
-
-app.post("/urls/:id", (req, res) => {
-
 })
 
 
