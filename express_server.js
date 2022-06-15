@@ -14,11 +14,24 @@ app.use(morgan('dev'))
 app.use(cookieParser())
 const PORT = 8080; // default port 8080
 
-//fake database
+//fake url database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
+//fake user database
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
 // GENERATES RANDOM STRINGS FOR SHORTURL
 const generateRandomString = function (database) {
   let randomNumberArray = [];
@@ -37,7 +50,10 @@ const generateRandomString = function (database) {
     }
   }).join('');
 };
-
+// getUser
+const getUser = function (value, userDB) {
+  return Object.values(userDB).find(user => user.id === value || user.email === value);
+};
 
 /* GET REQUESTS*/
 //just demo useless
@@ -47,7 +63,21 @@ app.get("/hello", (req, res) => {
 });
 // Redirects to the urls page if no address is defined
 app.get("/", (req, res) => {
-  res.redirect('/urls')
+  // res.redirect('/urls')
+  const id = req.cookies['user_id']
+  if (id) {
+    res.redirect('/urls')
+  } else {
+    res.redirect('/login')
+  }
+});
+
+
+//register
+app.get("/register", (req, res) => {
+  const id = req.cookies['user_id']
+  const templateVars = {urls: urlDatabase, user: users[id],}
+  res.render("register", templateVars);
 });
 
 //login
@@ -55,28 +85,36 @@ app.get('/login', (req, res) => {
   const templateVars = {
     user: null
   };
-  // res.render('login', templateVars);
+  res.render('login', templateVars);
 });
 
 
 // main page show all the urls
 app.get("/urls", (req, res) => {
-  const templateVars = {urls: urlDatabase, username: req.cookies["username"],}
-  res.render("urls_index", templateVars);
+  const id = req.cookies['user_id']
+  if (!id) {
+    res.redirect('/login');
+  } else {
+    const user = getUser(id, users)
+    const templateVars = {urls: urlDatabase, user: user,}
+    res.render("urls_index", templateVars);
+  }
 });
 
 // Create New URLs(long)
 app.get("/urls/new", (req, res) => {
-  const templateVars = {username: req.cookies["username"],}
+  const id = req.cookies['user_id']
+  const templateVars = {user: users[id],}
   res.render("urls_new", templateVars);
 });
 
 //view short URLs
 app.get("/urls/:shortURL", (req, res) => {
+  const id = req.cookies['user_id']
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"],
+    user: users[id]
   };
   res.render("urls_show", templateVars);
 });
@@ -94,17 +132,53 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 /* POST REQUESTS*/
-//deal login
+
+// deal register
+app.post("/register", (req, res) => {
+  // console.log('register Handler========', req.body)
+  const id = generateRandomString(users)
+  const {email, password} = req.body
+  //email used already check
+  for (const key in users) {
+    if (users[key].email === email) {
+      res.send('This email already beed used!')
+      return
+    }
+  }
+  // no possible since I already do frontend check but assignment requires to add
+  if (email === '' || password === '' || email === undefined || password === undefined) {
+    res.send(400)
+  }
+  const user = {id, email, password}
+  users[id] = user
+  // console.log(users)
+  res.cookie('user_id', id)
+  res.redirect('/urls')
+})
+
+//deal login logic wrong
 app.post("/login", (req, res) => {
   // console.log('login Handler========', req.body)
-  res.cookie('username', req.body.username)
-  res.redirect('/urls')
+  const {email, password} = req.body
+  const user = getUser(email, users)
+  // no possible since I already do frontend check but assignment requires to add
+  if (email === '' || password === '' || email === undefined || password === undefined) {
+    res.send(400)
+  }
+
+  if (!user) {
+    res.send('Email or Password is not correct!!!')
+  } else {
+    res.cookie('user_id', user.id)
+    res.redirect('/urls')
+  }
+
 })
 
 //deal logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('username')
-  res.redirect('/urls')
+  res.clearCookie('user_id')
+  res.redirect('/register')
 })
 
 // deal form request
