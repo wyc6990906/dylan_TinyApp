@@ -50,7 +50,10 @@ const generateRandomString = function (database) {
     }
   }).join('');
 };
-
+// getUser
+const getUser = function (value, userDB) {
+  return Object.values(userDB).find(user => user.id === value || user.email === value);
+};
 
 /* GET REQUESTS*/
 //just demo useless
@@ -60,13 +63,18 @@ app.get("/hello", (req, res) => {
 });
 // Redirects to the urls page if no address is defined
 app.get("/", (req, res) => {
-  res.redirect('/urls')
+  // res.redirect('/urls')
+  const id = req.cookies['user_id']
+  if (id) {
+    res.redirect('/urls')
+  } else {
+    res.redirect('/login')
+  }
 });
 
 
 //register
 app.get("/register", (req, res) => {
-  // const templateVars = {greeting: 'Hello World!'};
   const id = req.cookies['user_id']
   const templateVars = {urls: urlDatabase, user: users[id],}
   res.render("register", templateVars);
@@ -84,8 +92,13 @@ app.get('/login', (req, res) => {
 // main page show all the urls
 app.get("/urls", (req, res) => {
   const id = req.cookies['user_id']
-  const templateVars = {urls: urlDatabase, user: users[id],}
-  res.render("urls_index", templateVars);
+  if (!id) {
+    res.redirect('/login');
+  } else {
+    const user = getUser(id, users)
+    const templateVars = {urls: urlDatabase, user: user,}
+    res.render("urls_index", templateVars);
+  }
 });
 
 // Create New URLs(long)
@@ -119,6 +132,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 /* POST REQUESTS*/
+
 // deal register
 app.post("/register", (req, res) => {
   // console.log('register Handler========', req.body)
@@ -126,13 +140,13 @@ app.post("/register", (req, res) => {
   const {email, password} = req.body
   //email used already check
   for (const key in users) {
-    if(users[key].email === email){
+    if (users[key].email === email) {
       res.send('This email already beed used!')
       return
     }
   }
-  // no possible
-  if(email === '' || password === '' || email === undefined || password === undefined){
+  // no possible since I already do frontend check but assignment requires to add
+  if (email === '' || password === '' || email === undefined || password === undefined) {
     res.send(400)
   }
   const user = {id, email, password}
@@ -142,13 +156,23 @@ app.post("/register", (req, res) => {
   res.redirect('/urls')
 })
 
-
-//deal login
+//deal login logic wrong
 app.post("/login", (req, res) => {
   // console.log('login Handler========', req.body)
-  const id = generateRandomString(users)
-  res.cookie('user_id', id)
-  res.redirect('/urls')
+  const {email, password} = req.body
+  const user = getUser(email, users)
+  // no possible since I already do frontend check but assignment requires to add
+  if (email === '' || password === '' || email === undefined || password === undefined) {
+    res.send(400)
+  }
+
+  if (!user) {
+    res.send('Email or Password is not correct!!!')
+  } else {
+    res.cookie('user_id', user.id)
+    res.redirect('/urls')
+  }
+
 })
 
 //deal logout

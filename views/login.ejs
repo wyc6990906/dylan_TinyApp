@@ -13,21 +13,20 @@
 <%- include('partials/_header') %>
 
 <div style="">
-    <h2 class="heading" style="margin: 1em;">Create an Account</h2>
+    <h2 class="heading" style="margin: 1em;">Sign In</h2>
     <div class="form-group">
     </div>
-    <form method="POST" action="register">
-        <input name="email"  type="email" required placeholder="Enter your email"
+    <form method="POST" action="login">
+        <input name="email" type="email" required placeholder="Enter your email"
                style="width: 270px; margin-left: 2em;padding-left: 10px">
         <br/>
         <div style="margin: 1em;"></div>
         <input name="password" required type="password" placeholder="Enter your password"
                style="width: 270px; margin-left: 2em;padding-left: 10px">
         <br/>
-
-        <button type="submit" class="btn btn-secondary" style="margin-left: 2em; margin-top: 1em;">Get Started</button>
+        <button type="submit" class="btn btn-secondary" style="margin-left: 2em; margin-top: 1em;">Sign In</button>
         <button type="button" class="btn btn-secondary" style="margin-left: 1em; margin-top: 1em;">
-            <a style="color: white;text-decoration: none" href="/login">Have Account?</a>
+            <a style="color: white;text-decoration: none" href="/register">Get Started</a>
         </button>
     </form>
 

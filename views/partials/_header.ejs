@@ -13,7 +13,7 @@
         </div>
         <!--  login form    -->
         <div>
-            <% if (user === undefined) { %>
+            <% if (!user) { %>
                 <div display="form-inline" style="margin-bottom: 5px">
                     <a href="/register">
                         <button type="submit" class="button btn-dark" display>Create Account</button>
@@ -25,7 +25,7 @@
                 </div>
             <% } else { %>
                 <form class="form-inline" method="POST" action="/logout">
-                    <label style="color: white;margin-right: 10px" for="username"><%= `Welcome back, ${user.email}!`; %></label>
+                    <label style="color: white;margin-right: 10px" for="email"><%= `Welcome back, ${user.email}!`; %></label>
                     <button type="submit" class="button btn-dark" style="margin-left: 2px;">Log Out</button>
                 </form>
             <% } %>
