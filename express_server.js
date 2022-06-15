@@ -67,7 +67,9 @@ app.get("/", (req, res) => {
 //register
 app.get("/register", (req, res) => {
   // const templateVars = {greeting: 'Hello World!'};
-  res.render("register");
+  const id = req.cookies['user_id']
+  const templateVars = {urls: urlDatabase, user: users[id],}
+  res.render("register", templateVars);
 });
 
 //login
@@ -75,28 +77,31 @@ app.get('/login', (req, res) => {
   const templateVars = {
     user: null
   };
-  // res.render('login', templateVars);
+  res.render('login', templateVars);
 });
 
 
 // main page show all the urls
 app.get("/urls", (req, res) => {
-  const templateVars = {urls: urlDatabase, username: req.cookies["username"],}
+  const id = req.cookies['user_id']
+  const templateVars = {urls: urlDatabase, user: users[id],}
   res.render("urls_index", templateVars);
 });
 
 // Create New URLs(long)
 app.get("/urls/new", (req, res) => {
-  const templateVars = {username: req.cookies["username"],}
+  const id = req.cookies['user_id']
+  const templateVars = {user: users[id],}
   res.render("urls_new", templateVars);
 });
 
 //view short URLs
 app.get("/urls/:shortURL", (req, res) => {
+  const id = req.cookies['user_id']
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"],
+    user: users[id]
   };
   res.render("urls_show", templateVars);
 });
@@ -118,11 +123,19 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/register", (req, res) => {
   // console.log('register Handler========', req.body)
   const id = generateRandomString(users)
-  const user = {
-    id,
-    email: req.body.email,
-    password: req.body.password
+  const {email, password} = req.body
+  //email used already check
+  for (const key in users) {
+    if(users[key].email === email){
+      res.send('This email already beed used!')
+      return
+    }
   }
+  // no possible
+  if(email === '' || password === '' || email === undefined || password === undefined){
+    res.send(400)
+  }
+  const user = {id, email, password}
   users[id] = user
   // console.log(users)
   res.cookie('user_id', id)
@@ -133,14 +146,15 @@ app.post("/register", (req, res) => {
 //deal login
 app.post("/login", (req, res) => {
   // console.log('login Handler========', req.body)
-  res.cookie('username', req.body.username)
+  const id = generateRandomString(users)
+  res.cookie('user_id', id)
   res.redirect('/urls')
 })
 
 //deal logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('username')
-  res.redirect('/urls')
+  res.clearCookie('user_id')
+  res.redirect('/register')
 })
 
 // deal form request

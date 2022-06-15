@@ -11,22 +11,24 @@
                 <a class="nav-item nav-link link-light" href="/urls/new">Create New URL</a>
             </div>
         </div>
-        <!--  login form       -->
+        <!--  login form    -->
         <div>
-            <% if (username === undefined) { %>
-            <form class="form-inline" method="POST" action="/login">
-                <label for="username" style="color: white">
-                    <input class="form-control" type="text" name="username" placeholder="username..."
-                           style="width: 150px;">
-                </label>
-                <button type="submit" class="button btn-dark" style="margin-left: 10px;">Login</button>
-                <% } else { %>
-                    <form class="form-inline" method="POST" action="/logout">
-                        <label for="username"
-                               style="color: white;margin: 10px"><%= `Welcome back, ${username}! `; %></label>
-                        <button type="submit" class="button btn-dark" style="margin-left: 2px;">Log Out</button>
-                    </form>
-                <% } %>
+            <% if (user === undefined) { %>
+                <div display="form-inline" style="margin-bottom: 5px">
+                    <a href="/register">
+                        <button type="submit" class="button btn-dark" display>Create Account</button>
+                    </a>
+                    <a href="/login">
+                        <button type="submit" class="button btn-dark" display>Sign In</button>
+                    </a>
+                    <small style="color: #fff">(Have an account?)</small>
+                </div>
+            <% } else { %>
+                <form class="form-inline" method="POST" action="/logout">
+                    <label style="color: white;margin-right: 10px" for="username"><%= `Welcome back, ${user.email}!`; %></label>
+                    <button type="submit" class="button btn-dark" style="margin-left: 2px;">Log Out</button>
+                </form>
+            <% } %>
             </form>
         </div>
 
