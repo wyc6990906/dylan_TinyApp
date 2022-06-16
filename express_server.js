@@ -107,11 +107,17 @@ app.get("/register", (req, res) => {
 
 //login
 app.get('/login', (req, res) => {
-  const templateVars = {
-    message: 'Please Sign In First',
-    user: null
-  };
-  res.render('login', templateVars);
+  const id = req.session["user_id"]
+  const user = getUser(id, users)
+  if (user) {
+    res.redirect('/urls');
+  } else {
+    const templateVars = {
+      message: 'Please Sign In First',
+      user: null
+    };
+    res.render('login', templateVars);
+  }
 });
 
 
@@ -127,7 +133,7 @@ app.get("/urls", (req, res) => {
   } else {
     const user = getUser(id, users)
     const urls = urlsForUser(id, urlDatabase)
-    const templateVars = {urls, user,}
+    const templateVars = {urls, user}
     res.render("urls_index", templateVars);
   }
 });
@@ -136,7 +142,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const id = req.session['user_id']
   const user = getUser(id, users)
-  if (id) {
+  if (user) {
     const templateVars = {user}
     res.render("urls_new", templateVars);
   } else {
@@ -148,14 +154,19 @@ app.get("/urls/new", (req, res) => {
 //view short URLs
 app.get("/urls/:shortURL", (req, res) => {
   const id = req.session['user_id']
-  if (!id) {
-    res.redirect('/login')
-  }
   const user = getUser(id, users)
   const {shortURL} = req.params
   if (!urlDatabase[shortURL]) {
     res.send('The URL you requested was not found.')
+  } else if (!user) {
+    const templateVars = {
+      user,
+      message: "Please sign in first.",
+    }
+    res.render('login', templateVars)
+    return
   }
+  // Statistics board logic
   const clickCount = urlDatabase[shortURL]["clickCount"]
   const templateVars = {
     shortURL,
@@ -167,18 +178,18 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-
 // Redirect to longURL //
 app.get("/u/:shortURL", (req, res) => {
   const {shortURL} = req.params;
-  if (urlDatabase[shortURL] === undefined) {
+  if (!urlDatabase[shortURL]) {
     res.send("This URL you requested can not be found.")
-  } else {
-    // Statistics board logic
-    visitorCount = getUniqueVisitorCount(req, users, visitorCount);
-    urlDatabase[shortURL]["clickCount"] = clicks += 1;
-    res.redirect(`${urlDatabase[shortURL].longURL}`);
   }
+  console.log('beforeClick=============',urlDatabase[shortURL]["clickCount"])
+  visitorCount = getUniqueVisitorCount(req, users, visitorCount)
+  urlDatabase[shortURL]["clickCount"] += 1
+  console.log('AfterClick',urlDatabase[shortURL]["clickCount"])
+  const longURL = urlDatabase[shortURL]["longURL"]
+  res.redirect(longURL)
 });
 
 

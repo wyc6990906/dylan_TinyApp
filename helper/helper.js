@@ -52,4 +52,4 @@ const getUniqueVisitorCount = function (req, userDatabase, visitorCount) {
 };
 
 
-module.exports = {generateRandomString, getUser, urlsForUser, getUniqueVisitorCount,registerUser}
+module.exports = {generateRandomString, getUser, urlsForUser, getUniqueVisitorCount, registerUser}
