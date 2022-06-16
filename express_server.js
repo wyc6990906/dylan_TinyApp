@@ -25,12 +25,16 @@ const PORT = 8080; // default port 8080
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
-    userID: "aJ48lW"
+    userID: "111111"
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
-    userID: "aJ48lW"
-  }
+    userID: "111111"
+  },
+  i3BoKB: {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "111111"
+  },
 };
 //fake user database
 const users = {
@@ -43,6 +47,12 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: bcrypt.hashSync("dishwasher-funk", 10)
+  },
+  //for easy test
+  "111111": {
+    id: "111111",
+    email: "admin@example.com",
+    password: bcrypt.hashSync("test", 10)
   }
 }
 
