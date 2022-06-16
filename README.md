@@ -31,7 +31,7 @@ Logged in user can edit shortened url
 
 Statistics Board
 
-![edit_url](/assets/screenshots/statisticBoard.png)
+![edit_url](/assets/screenshots/statistics.png)
 
 ## Dependencies
 
