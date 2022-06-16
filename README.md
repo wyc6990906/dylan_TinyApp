@@ -44,4 +44,4 @@ Logged in user can edit shortened url
 
 - Install all dependencies (using the `npm install` command).
 - Run the development web server using the `npm start` command.
-- You can easily test by input email = admin@example.com , password = test
+- You can easily test as admin : email = admin@example.com , password = test
