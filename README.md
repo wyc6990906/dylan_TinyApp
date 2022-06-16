@@ -29,6 +29,9 @@ Logged in user can edit shortened url
 
 ![edit_url](/assets/screenshots/editUrl.png)
 
+Statistics Board
+![edit_url](/assets/screenshots/statisticBoard.png)
+
 ## Dependencies
 
 - Node.js
