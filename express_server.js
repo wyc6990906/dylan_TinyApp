@@ -81,13 +81,12 @@ app.get("/hello", (req, res) => {
 });
 // Redirects to the urls page if no address is defined
 app.get("/", (req, res) => {
-  res.redirect('/urls')
-  // const id = req.session['user_id']
-  // if (id) {
-  //   res.redirect('/urls')
-  // } else {
-  //   res.redirect('/login')
-  // }
+  const id = req.session['user_id']
+  if (id) {
+    res.redirect('/urls')
+  } else {
+    res.redirect('/login')
+  }
 });
 
 
