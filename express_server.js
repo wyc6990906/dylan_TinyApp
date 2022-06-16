@@ -14,7 +14,7 @@ const methodOverride = require('method-override')
 
 const app = express();
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
-app.use(methodOverride('X-HTTP-Method-Override'))
+app.use(methodOverride("_method"));
 const {getUser, generateRandomString, urlsForUser} = require('./helper/helper')
 // Basic settings
 //ejs
@@ -190,7 +190,7 @@ app.post("/register", (req, res) => {
   res.redirect('/urls')
 })
 
-//deal login logic wrong
+//deal login
 app.post("/login", (req, res) => {
   // console.log('login Handler========', req.body)
   let {email, password} = req.body
@@ -230,8 +230,8 @@ app.post("/urls", (req, res) => {
 })
 
 
-//update url resource
-app.post("/urls/:shortURL", (req, res) => {
+//update url resource method-override version
+app.put("/urls/:shortURL", (req, res) => {
   // console.log(req.body)
   const {shortURL} = req.params;
   const id = req.session['user_id']
@@ -244,8 +244,8 @@ app.post("/urls/:shortURL", (req, res) => {
   }
 })
 
-//delete url resource
-app.delete("/urls/:shortURL/delete", (req, res) => {
+//delete url resource method-override version
+app.delete("/urls/:shortURL", (req, res) => {
   const {shortURL} = req.params;
   const id = req.session['user_id']
   if (id) {
