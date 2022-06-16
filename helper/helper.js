@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 // GENERATES RANDOM STRINGS FOR SHORTURL
 const generateRandomString = function (database) {
   let randomNumberArray = [];
@@ -32,4 +33,5 @@ const urlsForUser = function (id, urlDatabase) {
 };
 
 
-module.exports = {generateRandomString,getUser,urlsForUser}
+
+module.exports = {generateRandomString, getUser, urlsForUser}

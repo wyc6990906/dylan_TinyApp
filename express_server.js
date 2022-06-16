@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 //hash password
 const bcrypt = require('bcryptjs');
 const app = express();
-const {getUser,generateRandomString,urlsForUser} = require('./helper/helper')
+const {getUser, generateRandomString, urlsForUser} = require('./helper/helper')
 // Basic settings
 //ejs
 app.set("view engine", "ejs");
@@ -116,12 +116,18 @@ app.get("/urls/new", (req, res) => {
 //view short URLs
 app.get("/urls/:shortURL", (req, res) => {
   const id = req.session['user_id']
+  if (!id) {
+    res.redirect('/login')
+  }
   const user = getUser(id, users)
   const {shortURL} = req.params
+  if (!urlDatabase[shortURL]) {
+    res.send('This url is not exist!!!')
+  }
   const templateVars = {
     shortURL,
-    'longURL': urlDatabase[shortURL].longURL,
-    user
+    'longURL': urlDatabase[shortURL] !== undefined ? urlDatabase[shortURL].longURL : undefined,
+    user,
   };
   res.render("urls_show", templateVars);
 });
@@ -130,9 +136,8 @@ app.get("/urls/:shortURL", (req, res) => {
 // Redirect to longURL //
 app.get("/u/:shortURL", (req, res) => {
   const {shortURL} = req.params;
-  const longURL = urlDatabase[shortURL];
   if (urlDatabase[shortURL] === undefined) {
-    res.redirect(`/urls/${shortURL}`);
+    res.send("URL is not correct!!!")
   } else {
     res.redirect(`${urlDatabase[shortURL].longURL}`);
   }
@@ -198,7 +203,7 @@ app.post("/urls", (req, res) => {
     const shortURL = generateRandomString(urlDatabase)
     const {longURL} = req.body
     urlDatabase[shortURL] = {longURL, userID: id}
-    res.redirect(`/urls`)
+    res.redirect('/urls/' + shortURL);
   } else {
     res.redirect('/login')
   }
