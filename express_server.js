@@ -3,6 +3,8 @@ const morgan = require('morgan')
 const cookieParser = require("cookie-parser")
 // in order to make post buffer readable
 const bodyParser = require('body-parser')
+//hash password
+const bcrypt = require('bcryptjs');
 const app = express();
 // Basic settings
 //ejs
@@ -30,12 +32,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 10)
   }
 }
 // GENERATES RANDOM STRINGS FOR SHORTURL
@@ -117,7 +119,7 @@ app.get("/urls", (req, res) => {
       message: 'Please Sign In First',
       user: null
     };
-    res.render('login',templateVars);
+    res.render('login', templateVars);
   } else {
     const user = getUser(id, users)
     const urls = urlsForUser(id, urlDatabase)
@@ -171,7 +173,8 @@ app.get("/u/:shortURL", (req, res) => {
 app.post("/register", (req, res) => {
   // console.log('register Handler========', req.body)
   const id = generateRandomString(users)
-  const {email, password} = req.body
+  let {email, password} = req.body
+  password = bcrypt.hashSync(password,10)
   //email used already check
   for (const key in users) {
     if (users[key].email === email) {
@@ -193,7 +196,8 @@ app.post("/register", (req, res) => {
 //deal login logic wrong
 app.post("/login", (req, res) => {
   // console.log('login Handler========', req.body)
-  const {email, password} = req.body
+  let {email, password} = req.body
+  password = bcrypt.hashSync(password,10)
   const user = getUser(email, users)
   // no possible since I already do frontend check but assignment requires to add
   if (email === '' || password === '' || email === undefined || password === undefined) {
@@ -238,7 +242,7 @@ app.post("/urls/:shortURL", (req, res) => {
     res.redirect('/login');
   } else {
     const {newURL} = req.body;
-    urlDatabase[shortURL] = {longURL:newURL,userID:id}
+    urlDatabase[shortURL] = {longURL: newURL, userID: id}
     res.redirect(`/urls`);
   }
 })
