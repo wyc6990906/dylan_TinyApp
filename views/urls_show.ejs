@@ -16,7 +16,7 @@
         <div class="card-body">
             <h5 class="card-title">TinyURL
                 for: <%= longURL !== undefined ? longURL : "This TinyURL has not been set yet"; %></h5>
-            <p class="card-text">Short URL:<a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+            <p class="card-text">Short URL: <a href="<%= longURL %>"><%= shortURL %></a></p>
         </div>
         <div class="card-footer text-muted">
             <h3 class="card-title">Edit</h3>
