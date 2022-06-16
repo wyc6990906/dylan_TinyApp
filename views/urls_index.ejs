@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
           integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <style>
-        .table th, .table td {
-          text-align: center !important;
-        }
+      .table th, .table td {
+        text-align: center !important;
+      }
     </style>
     <title>Dylan's URL TinyApp</title>
 </head>
@@ -33,7 +33,9 @@
             <tr>
                 <td class="align-middle"><%= url %></td>
                 <td class="align-middle"><%= urls[url].longURL %></td>
-                <td><a href="/urls/<%= url %>"><button class="btn btn-outline-secondary">Edit</button></a></td>
+                <td><a href="/urls/<%= url %>">
+                        <button class="btn btn-outline-secondary">Edit</button>
+                    </a></td>
                 <td class="align-middle">
                     <form method="POST"
                           action="/urls/<%= url %>?_method=DELETE">

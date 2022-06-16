@@ -11,11 +11,13 @@ const favicon = require('serve-favicon')
 const path = require('path')
 //  method-override
 const methodOverride = require('method-override')
-
 const app = express();
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(methodOverride("_method"));
-const {getUser, generateRandomString, urlsForUser} = require('./helper/helper')
+const {getUser, generateRandomString, urlsForUser, getUniqueVisitorCount, registerUser} = require('./helper/helper')
+//Set global variables for /urls/:shortURL endpoint statistics
+let clicks = 0;
+let visitorCount = 0
 // Basic settings
 //ejs
 app.set("view engine", "ejs");
@@ -33,34 +35,41 @@ const PORT = 8080; // default port 8080
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
-    userID: "111111"
+    userID: "111111",
+    clickCount: 0
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
-    userID: "111111"
+    userID: "111111",
+    clickCount: 0
   },
   i3BoKB: {
     longURL: "http://www.lighthouselabs.ca",
-    userID: "111111"
+    userID: "111111",
+    clickCount: 0
   },
 };
 //fake user database
+
 const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10),
+    hasClicked: false,
   },
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: bcrypt.hashSync("dishwasher-funk", 10)
+    password: bcrypt.hashSync("dishwasher-funk", 10),
+    hasClicked: false,
   },
   //for easy test
   "111111": {
     id: "111111",
     email: "admin@example.com",
-    password: bcrypt.hashSync("test", 10)
+    password: bcrypt.hashSync("test", 10),
+    hasClicked: false,
   }
 }
 
@@ -72,23 +81,29 @@ app.get("/hello", (req, res) => {
 });
 // Redirects to the urls page if no address is defined
 app.get("/", (req, res) => {
-  // res.redirect('/urls')
-  const id = req.session['user_id']
-  if (id) {
-    res.redirect('/urls')
-  } else {
-    res.redirect('/login')
-  }
+  res.redirect('/urls')
+  // const id = req.session['user_id']
+  // if (id) {
+  //   res.redirect('/urls')
+  // } else {
+  //   res.redirect('/login')
+  // }
 });
 
 
 //register
 app.get("/register", (req, res) => {
-  const templateVars = {
-    message: null,
-    user: null
-  };
-  res.render('register', templateVars);
+  const id = req.session['user_id']
+  const user = getUser(id, users)
+  if (user) {
+    res.redirect('/urls')
+  } else {
+    const templateVars = {
+      user
+    }
+    res.render('register', templateVars);
+  }
+
 });
 
 //login
@@ -140,12 +155,15 @@ app.get("/urls/:shortURL", (req, res) => {
   const user = getUser(id, users)
   const {shortURL} = req.params
   if (!urlDatabase[shortURL]) {
-    res.send('This url is not exist!!!')
+    res.send('The URL you requested was not found.')
   }
+  const clickCount = urlDatabase[shortURL]["clickCount"]
   const templateVars = {
     shortURL,
     'longURL': urlDatabase[shortURL] !== undefined ? urlDatabase[shortURL].longURL : undefined,
     user,
+    clickCount,
+    visitorCount
   };
   res.render("urls_show", templateVars);
 });
@@ -155,8 +173,11 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const {shortURL} = req.params;
   if (urlDatabase[shortURL] === undefined) {
-    res.send("URL is not correct!!!")
+    res.send("This URL you requested can not be found.")
   } else {
+    // Statistics board logic
+    visitorCount = getUniqueVisitorCount(req, users, visitorCount);
+    urlDatabase[shortURL]["clickCount"] = clicks += 1;
     res.redirect(`${urlDatabase[shortURL].longURL}`);
   }
 });
@@ -166,28 +187,18 @@ app.get("/u/:shortURL", (req, res) => {
 
 // deal register
 app.post("/register", (req, res) => {
-  // console.log('register Handler========', req.body)
-  const id = generateRandomString(users)
   let {email, password} = req.body
-  password = bcrypt.hashSync(password, 10)
-  //email used already check
-  for (const key in users) {
-    if (users[key].email === email) {
-      res.send('This email already beed used!')
-      return
-    }
-  }
   // no possible since I already do frontend check but assignment requires to add
   if (email === '' || password === '' || email === undefined || password === undefined) {
     res.send(400)
+  } else {
+    if (getUser(email, users)) {
+      res.send("This email already beed used!");
+    } else {
+      req.session['user_id'] = registerUser(email, password, users).id;
+      res.redirect(301, '/urls');
+    }
   }
-  const user = {id, email, password}
-  //  to see bcrypt password works fine or no
-  // console.log(user)
-  users[id] = user
-  // console.log(users)
-  req.session['user_id'] = id
-  res.redirect('/urls')
 })
 
 //deal login
@@ -212,21 +223,17 @@ app.post("/login", (req, res) => {
 //deal logout
 app.post("/logout", (req, res) => {
   req.session = null
-  res.redirect('/login')
+  res.redirect('/urls')
 })
 
 // deal form request
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
   const id = req.session['user_id']
-  if (id) {
-    const shortURL = generateRandomString(urlDatabase)
-    const {longURL} = req.body
-    urlDatabase[shortURL] = {longURL, userID: id}
-    res.redirect('/urls/' + shortURL);
-  } else {
-    res.redirect('/login')
-  }
+  const shortURL = generateRandomString(urlDatabase)
+  const {longURL} = req.body
+  urlDatabase[shortURL] = {longURL, userID: id, clickCount: 0}
+  res.redirect('/urls/' + shortURL);
 })
 
 

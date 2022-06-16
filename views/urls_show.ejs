@@ -17,11 +17,23 @@
             <h5 class="card-title">TinyURL
                 for: <%= longURL !== undefined ? longURL : "This TinyURL has not been set yet"; %></h5>
             <p class="card-text">Short URL: <a href="<%= longURL %>"><%= shortURL %></a></p>
+            <div class="card text-bg-dark mb-3" style="width: 19rem;margin: 0 auto">
+                <div class="card-header">
+                    <h5 class="card-title">Statistics Board</h5>
+                </div>
+                <div class="card-body">
+                    <p>Number of clicks: <%= clickCount %></p>
+                    <p>Number of unique visits: <%= visitorCount %></p>
+                </div>
+            </div>
+
+
         </div>
         <div class="card-footer text-muted">
             <h3 class="card-title">Edit</h3>
             <div>
-                <form class="form-inline justify-content-center" method="POST" action="/urls/<%= shortURL %>?_method=PUT ">
+                <form class="form-inline justify-content-center" method="POST"
+                      action="/urls/<%= shortURL %>?_method=PUT ">
                     <label for="newURL">New URL:</label>
                     <input style="width: 300px; margin: 1em;" required class="form-control" type="text" name="newURL"
                            placeholder=" <%= longURL !== undefined ? longURL : "This TinyURL has not been set yet"; %> ">

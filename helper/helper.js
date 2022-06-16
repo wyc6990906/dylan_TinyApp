@@ -17,6 +17,16 @@ const generateRandomString = function (database) {
     }
   }).join('');
 };
+
+const registerUser = function (email, password, userDB) {
+
+  const id = generateRandomString(userDB);
+
+  userDB[id] = {id, email, password: bcrypt.hashSync(password, 10)};
+
+  return userDB[id];
+
+};
 // getUser
 const getUser = function (value, userDB) {
   return Object.values(userDB).find(user => user.id === value || user.email === value);
@@ -31,7 +41,15 @@ const urlsForUser = function (id, urlDatabase) {
   }
   return urls;
 };
+//
+const getUniqueVisitorCount = function (req, userDatabase, visitorCount) {
+  let cookieID = req.session["user_id"];
+  if (!userDatabase[cookieID]["hasClicked"]) {
+    visitorCount++;
+    userDatabase[cookieID]["hasClicked"] = true;
+  }
+  return visitorCount;
+};
 
 
-
-module.exports = {generateRandomString, getUser, urlsForUser}
+module.exports = {generateRandomString, getUser, urlsForUser, getUniqueVisitorCount,registerUser}
