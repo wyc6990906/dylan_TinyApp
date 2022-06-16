@@ -4,9 +4,13 @@ const morgan = require('morgan')
 const cookieSession = require('cookie-session');
 // in order to make post buffer readable
 const bodyParser = require('body-parser')
-//hash password
+//  hash password
 const bcrypt = require('bcryptjs');
+//  method-override
+const methodOverride = require('method-override')
+
 const app = express();
+app.use(methodOverride('X-HTTP-Method-Override'))
 const {getUser, generateRandomString, urlsForUser} = require('./helper/helper')
 // Basic settings
 //ejs
@@ -174,6 +178,8 @@ app.post("/register", (req, res) => {
     res.send(400)
   }
   const user = {id, email, password}
+  //  to see bcrypt password works fine or no
+  // console.log(user)
   users[id] = user
   // console.log(users)
   req.session['user_id'] = id
@@ -242,6 +248,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     delete urlDatabase[shortURL];
     res.redirect('/urls');
   } else {
+    //this is make more sense
     res.redirect('/login')
   }
 
