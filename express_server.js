@@ -7,7 +7,7 @@ const bodyParser = require('body-parser')
 //hash password
 const bcrypt = require('bcryptjs');
 const app = express();
-const {getUser,generateRandomString,urlsForUser} = require('./helper/function')
+const {getUser,generateRandomString,urlsForUser} = require('./helper/helper')
 // Basic settings
 //ejs
 app.set("view engine", "ejs");
