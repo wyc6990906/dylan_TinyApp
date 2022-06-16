@@ -1,6 +1,7 @@
 const express = require("express")
 const morgan = require('morgan')
-const cookieParser = require("cookie-parser")
+// const cookieParser = require("cookie-parser")
+const cookieSession = require('cookie-session');
 // in order to make post buffer readable
 const bodyParser = require('body-parser')
 //hash password
@@ -13,7 +14,10 @@ app.use(bodyParser.urlencoded({extended: true}))
 //use morgan middleware to log bugs
 app.use(morgan('dev'))
 //cookie parser
-app.use(cookieParser())
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2']
+}))
 const PORT = 8080; // default port 8080
 
 //fake url database
@@ -83,7 +87,7 @@ app.get("/hello", (req, res) => {
 // Redirects to the urls page if no address is defined
 app.get("/", (req, res) => {
   // res.redirect('/urls')
-  const id = req.cookies['user_id']
+  const id = req.session['user_id']
   if (id) {
     res.redirect('/urls')
   } else {
@@ -113,7 +117,7 @@ app.get('/login', (req, res) => {
 
 // main page show all the urls
 app.get("/urls", (req, res) => {
-  const id = req.cookies['user_id']
+  const id = req.session['user_id']
   if (!id) {
     const templateVars = {
       message: 'Please Sign In First',
@@ -130,7 +134,7 @@ app.get("/urls", (req, res) => {
 
 // Create New URLs(long)
 app.get("/urls/new", (req, res) => {
-  const id = req.cookies['user_id']
+  const id = req.session['user_id']
   const user = getUser(id, users)
   if (id) {
     const templateVars = {user}
@@ -143,7 +147,7 @@ app.get("/urls/new", (req, res) => {
 
 //view short URLs
 app.get("/urls/:shortURL", (req, res) => {
-  const id = req.cookies['user_id']
+  const id = req.session['user_id']
   const user = getUser(id, users)
   const {shortURL} = req.params
   const templateVars = {
@@ -174,7 +178,7 @@ app.post("/register", (req, res) => {
   // console.log('register Handler========', req.body)
   const id = generateRandomString(users)
   let {email, password} = req.body
-  password = bcrypt.hashSync(password,10)
+  password = bcrypt.hashSync(password, 10)
   //email used already check
   for (const key in users) {
     if (users[key].email === email) {
@@ -189,7 +193,7 @@ app.post("/register", (req, res) => {
   const user = {id, email, password}
   users[id] = user
   // console.log(users)
-  res.cookie('user_id', id)
+  req.session['user_id'] = id
   res.redirect('/urls')
 })
 
@@ -197,7 +201,7 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   // console.log('login Handler========', req.body)
   let {email, password} = req.body
-  password = bcrypt.hashSync(password,10)
+  password = bcrypt.hashSync(password, 10)
   const user = getUser(email, users)
   // no possible since I already do frontend check but assignment requires to add
   if (email === '' || password === '' || email === undefined || password === undefined) {
@@ -206,7 +210,7 @@ app.post("/login", (req, res) => {
   if (!user) {
     res.send('Email or Password is not correct!!!')
   } else {
-    res.cookie('user_id', user.id)
+    req.session['user_id'] = user.id
     res.redirect('/urls')
   }
 
@@ -214,14 +218,14 @@ app.post("/login", (req, res) => {
 
 //deal logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id')
+  req.session = null
   res.redirect('/login')
 })
 
 // deal form request
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
-  const id = req.cookies["user_id"]
+  const id = req.session['user_id']
   if (id) {
     const shortURL = generateRandomString(urlDatabase)
     const {longURL} = req.body
@@ -237,7 +241,7 @@ app.post("/urls", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   // console.log(req.body)
   const {shortURL} = req.params;
-  const id = req.cookies["user_id"]
+  const id = req.session['user_id']
   if (!id) {
     res.redirect('/login');
   } else {
@@ -250,7 +254,7 @@ app.post("/urls/:shortURL", (req, res) => {
 //delete url resource
 app.post("/urls/:shortURL/delete", (req, res) => {
   const {shortURL} = req.params;
-  const id = req.cookies["user_id"]
+  const id = req.session['user_id']
   if (id) {
     delete urlDatabase[shortURL];
     res.redirect('/urls');
