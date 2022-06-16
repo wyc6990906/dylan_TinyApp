@@ -6,10 +6,14 @@ const cookieSession = require('cookie-session');
 const bodyParser = require('body-parser')
 //  hash password
 const bcrypt = require('bcryptjs');
+// set my own favicon
+const favicon = require('serve-favicon')
+const path = require('path')
 //  method-override
 const methodOverride = require('method-override')
 
 const app = express();
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(methodOverride('X-HTTP-Method-Override'))
 const {getUser, generateRandomString, urlsForUser} = require('./helper/helper')
 // Basic settings
@@ -241,7 +245,7 @@ app.post("/urls/:shortURL", (req, res) => {
 })
 
 //delete url resource
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.delete("/urls/:shortURL/delete", (req, res) => {
   const {shortURL} = req.params;
   const id = req.session['user_id']
   if (id) {

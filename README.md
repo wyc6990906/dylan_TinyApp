@@ -27,6 +27,7 @@ Logged in user can edit shortened url
 
 ![edit_url](/assets/screenshots/editUrl.png)
 
+
 ## Dependencies
 
 - Node.js
@@ -37,6 +38,7 @@ Logged in user can edit shortened url
 - cookie-session
 - npm morgan
 - Nodemon
+- serve-favicon - custom favicon.ico
 
 ## Getting Started
 

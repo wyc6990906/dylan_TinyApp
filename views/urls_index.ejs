@@ -11,6 +11,7 @@
           text-align: center !important;
         }
     </style>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
     <title>Dylan's URL TinyApp</title>
 </head>
 <body>
@@ -35,7 +36,7 @@
                 <td class="align-middle"><%= urls[url].longURL %></td>
                 <td><a href="/urls/<%= url %>"><button class="btn btn-outline-secondary">Edit</button></a></td>
                 <td class="align-middle">
-                    <form method="POST" action="/urls/<%= url %>/delete"><input type="submit"
+                    <form method="POST" enctype="application/x-www-form-urlencoded" action="/urls/<%= url %>/delete"><input type="submit"
                                                                                 class="btn btn-outline-danger"
                                                                                 value="Delete"></input></form>
                 </td>
