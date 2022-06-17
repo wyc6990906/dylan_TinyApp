@@ -50,7 +50,6 @@ const urlDatabase = {
   },
 };
 //fake user database
-
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -88,8 +87,6 @@ app.get("/", (req, res) => {
     res.redirect('/login')
   }
 });
-
-
 //register
 app.get("/register", (req, res) => {
   const id = req.session['user_id']
@@ -104,7 +101,6 @@ app.get("/register", (req, res) => {
   }
 
 });
-
 //login
 app.get('/login', (req, res) => {
   const id = req.session["user_id"]
@@ -119,8 +115,6 @@ app.get('/login', (req, res) => {
     res.render('login', templateVars);
   }
 });
-
-
 // main page show all the urls
 app.get("/urls", (req, res) => {
   const id = req.session['user_id']
@@ -150,7 +144,6 @@ app.get("/urls/new", (req, res) => {
   }
 
 });
-
 //view short URLs
 app.get("/urls/:shortURL", (req, res) => {
   const id = req.session['user_id']
@@ -177,21 +170,19 @@ app.get("/urls/:shortURL", (req, res) => {
   };
   res.render("urls_show", templateVars);
 });
-
 // Redirect to longURL //
 app.get("/u/:shortURL", (req, res) => {
   const {shortURL} = req.params;
   if (!urlDatabase[shortURL]) {
     res.send("This URL you requested can not be found.")
   }
-  console.log('beforeClick=============',urlDatabase[shortURL]["clickCount"])
+  console.log('beforeClick=============', urlDatabase[shortURL]["clickCount"])
   visitorCount = getUniqueVisitorCount(req, users, visitorCount)
   urlDatabase[shortURL]["clickCount"] += 1
-  console.log('AfterClick',urlDatabase[shortURL]["clickCount"])
+  console.log('AfterClick', urlDatabase[shortURL]["clickCount"])
   const longURL = urlDatabase[shortURL]["longURL"]
   res.redirect(longURL)
 });
-
 
 /* POST REQUESTS*/
 
@@ -210,7 +201,6 @@ app.post("/register", (req, res) => {
     }
   }
 })
-
 //deal login
 app.post("/login", (req, res) => {
   // console.log('login Handler========', req.body)
@@ -229,13 +219,11 @@ app.post("/login", (req, res) => {
   }
 
 })
-
 //deal logout
 app.post("/logout", (req, res) => {
   req.session = null
   res.redirect('/urls')
 })
-
 // deal form request
 app.post("/urls", (req, res) => {
   // console.log(req.body);  // Log the POST request body to the console
@@ -245,8 +233,6 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortURL] = {longURL, userID: id, clickCount: 0}
   res.redirect('/urls/' + shortURL);
 })
-
-
 //update url resource method-override version
 app.put("/urls/:shortURL", (req, res) => {
   // console.log(req.body)
@@ -260,7 +246,6 @@ app.put("/urls/:shortURL", (req, res) => {
     res.redirect(`/urls`);
   }
 })
-
 //delete url resource method-override version
 app.delete("/urls/:shortURL", (req, res) => {
   const {shortURL} = req.params;
@@ -274,7 +259,6 @@ app.delete("/urls/:shortURL", (req, res) => {
   }
 
 })
-
 
 app.listen(PORT, () => {
   console.log(`Dylan's URL TinyApp listening on port ${PORT}!`);

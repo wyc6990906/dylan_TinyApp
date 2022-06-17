@@ -17,15 +17,11 @@ const generateRandomString = function (database) {
     }
   }).join('');
 };
-
+// registerUser
 const registerUser = function (email, password, userDB) {
-
   const id = generateRandomString(userDB);
-
   userDB[id] = {id, email, password: bcrypt.hashSync(password, 10)};
-
   return userDB[id];
-
 };
 // getUser
 const getUser = function (value, userDB) {
@@ -41,7 +37,7 @@ const urlsForUser = function (id, urlDatabase) {
   }
   return urls;
 };
-//
+// getUniqueVisitorCount
 const getUniqueVisitorCount = function (req, userDatabase, visitorCount) {
   let cookieID = req.session["user_id"];
   if (!userDatabase[cookieID]["hasClicked"]) {
